@@ -1,0 +1,11 @@
+version: '3'
+# Định nghĩa các dịch vụ bạn muốn chạy. Trong trường hợp này, chúng ta chỉ có một dịch vụ là nginx.
+services:
+  nginx:
+  # Chỉ định Docker sẽ sử dụng image Nginx phiên bản mới nhất.
+    image: nginx:latest
+  #  Áp dụng việc map cổng, với cú pháp "host_port:container_port". Ở đây, cổng 8080 của máy host sẽ được map vào cổng 80 của container.
+    ports:
+      - "8080:80"
+    # Đảm bảo container tự động khởi động lại nếu bị lỗi.
+    restart: always 
