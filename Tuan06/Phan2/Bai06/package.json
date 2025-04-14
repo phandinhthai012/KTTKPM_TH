@@ -1,0 +1,12 @@
+{
+  "name": "node-multi-stage",
+  "version": "1.0.0",
+  "description": "Docker multi-stage build for Node.js",
+  "scripts": {
+    "start": "node index.js",
+    "build": "echo 'Build step completed!'"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
