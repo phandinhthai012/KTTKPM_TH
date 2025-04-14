@@ -1,0 +1,127 @@
+version: '3.8'
+
+services:
+  customer-service:
+    build: ./customer-service
+    ports:
+      - "3003:3003"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/customerDB_M 
+    depends_on:
+      - mongodb
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - CUSTOMER_SERVICE_URL=http://customer-service:3003
+    depends_on:
+      - customer-service
+
+  mongodb:
+    image: mongo:6
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
+
+
+
+# version: '3.8'
+
+# services:
+#   # Product Service
+#   product-service:
+#     build: ./product-service
+#     ports:
+#       - "5001:5001"
+#     environment:
+#       - DATABASE_URL=mongodb://mongo:27017/product_db
+#     depends_on:
+#       - mongo
+#       - kafka
+
+#   # Order Service
+#   order-service:
+#     build: ./order-service
+#     ports:
+#       - "5002:5002"
+#     environment:
+#       - DATABASE_URL=mongodb://mongo:27017/order_db
+#     depends_on:
+#       - mongo
+#       - kafka
+
+#   # Customer Service
+#   customer-service:
+#     build: ./customer-service
+#     ports:
+#       - "5003:5003"
+#     environment:
+#       - DATABASE_URL=mongodb://mongo:27017/customer_db
+#     depends_on:
+#       - mongo
+#       - kafka
+
+#   # API Gateway
+#   api-gateway:
+#     build: ./api-gateway
+#     ports:
+#       - "8080:8080"
+#     depends_on:
+#       - product-service
+#       - order-service
+#       - customer-service
+
+#   # MongoDB Database
+#   mongo:
+#     image: mongo:latest
+#     ports:
+#       - "27017:27017"  # Mở cổng 27017 cho MongoDB
+#     volumes:
+#       - mongo_data:/data/db  # Lưu trữ dữ liệu MongoDB
+
+#   # Kafka (Message Broker)
+#   kafka:
+#     image: wurstmeister/kafka
+#     environment:
+#       KAFKA_ADVERTISED_LISTENER: INSIDE://kafka:9093
+#       KAFKA_LISTENER_SECURITY_PROTOCOL: PLAINTEXT
+#       KAFKA_LISTENER_NAME: INSIDE
+#       KAFKA_LISTENER_INTERNAL_PORT: 9093
+#       KAFKA_LISTENER_OUTSIDE_PORT: 9092
+#       KAFKA_LISTENER_NAME_OUTSIDE: OUTSIDE
+#       KAFKA_LISTENER_PORT: 9092
+#       KAFKA_LISTENER_NAMES: INSIDE,OUTSIDE
+#       KAFKA_LISTENER_INTER_BROKER_LISTENER_NAME: INSIDE
+#       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181  # Kết nối với Zookeeper
+#     ports:
+#       - "9092:9092"
+#       - "9093:9093"
+#     depends_on:
+#       - zookeeper
+
+#   # Zookeeper (Needed for Kafka to function properly)
+#   zookeeper:
+#     image: wurstmeister/zookeeper
+#     ports:
+#       - "2181:2181"
+
+# volumes:
+#   mongo_data:  # Persistent volume for MongoDB data
+
+
+
+# customer-service:
+#   build: ./customer-service
+#   ports:
+#     - "5003:5003"
+#   environment:
+#     - DATABASE_URL=mongodb://mongo:27017/customer_db
+#   depends_on:
+#     - mongo
