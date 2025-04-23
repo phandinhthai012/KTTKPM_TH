@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  customer-service:
+    build: ./CustomerService
+    ports:
+      - "3001:3001"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/Customerdb
+    depends_on:
+      - mongodb
+    networks:
+      - microservices-network
+
+  order-service:
+    build: ./OrderService
+    ports:
+      - "3002:3002"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/Orderdb
+    depends_on:
+      - mongodb
+    networks:
+      - microservices-network
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - microservices-network
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - CUSTOMER_SERVICE_URL=http://customer-service:3001
+      - ORDER_SERVICE_URL=http://order-service:3002
+    depends_on:
+      - customer-service
+      - order-service
+    networks:
+      - microservices-network
+
+  mongodb:
+    image: mongo:6
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - microservices-network
+
+volumes:
+  mongo_data:
+
+networks:
+  microservices-network:  # Đảm bảo mạng được khai báo ở cuối
