@@ -1,4 +1,5 @@
 const Customer = require('../model/customerModel')
+const { breaker } = require('../config/circuitBreaker');
 const { sendToQueue } = require('../config/rabbitmq');
 const createCustomer = async (req, res) => {
     try {
@@ -61,11 +62,29 @@ const deleteCustomer = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 }
+
+const getOderByCustomerId = async (req, res) => {
+    try {
+        const { customerId } = req.params;
+        const respone = await breaker.fire(customerId);
+        if (!respone || respone.length === 0) {
+            return res.status(404).json({ message: "Orders not found" });
+        }
+        res.status(200).json({
+            message: "Get orders successfully",
+            orders: respone
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 const customerController = {
     createCustomer,
     getAllCustomers,
     getCustomerById,
     updateCustomer,
-    deleteCustomer
+    deleteCustomer,
+    getOderByCustomerId
 }
 module.exports = customerController;

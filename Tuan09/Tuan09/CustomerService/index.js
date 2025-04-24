@@ -1,13 +1,6 @@
 const express = require('express');
 const app = express();
 
-const CircuitBreaker = require('opossum');
-const retry = require('async-retry');
-const timeout = require('timeout-as-promised');
-const Bottleneck = require('bottleneck');
-
-
-
 require('dotenv').config();
 const { connectRabbitMQ } = require('./src/config/rabbitmq');
 const connectDB = require('./src/config/db');
