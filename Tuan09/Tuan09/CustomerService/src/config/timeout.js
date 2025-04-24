@@ -1,49 +1,18 @@
-const timeout = require('promise-timeout');
+const axios = require('axios');
 
-// Hàm config timeout
-async function withTimeout(promise, ms) {
-  try {
-    const result = await timeout(promise, ms);
-    return result;
-  } catch (error) {
-    console.log('Timeout error:', error);
-    throw error;  // Bạn có thể ném lại lỗi để xử lý ở nơi khác
-  }
+
+function timeoutPromise(promise, ms) {
+  const timeout = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error(`Timeout after ${ms}ms`)), ms)
+  );
+
+  return Promise.race([promise, timeout]);
 }
 
-// Xuất hàm config timeout
-module.exports = {
-  withTimeout
-};
+async function fetchOrdersWithTimeout(customerId, ms = 3000) {
+  const request = axios.get(`http://order-service:3002/order/customer/${customerId}`);
+  return await timeoutPromise(request, ms);
+}
 
-
-
-
-// const { breaker } = require('../config/circuitBreaker');
-// const retry = require('../config/retry');
-// const timeout = require('../config/timeout');
-// const rateLimiter = require('../config/rateLimiter');
-
-// // Hàm thực hiện các hành động với các cơ chế đã cấu hình
-// async function handleServiceRequest() {
-//   try {
-//     // Áp dụng Retry
-//     await retry();
-
-//     // Áp dụng Time Limiter
-//     await timeout();
-
-//     // Áp dụng Rate Limiter
-//     await rateLimiter();
-
-//     // Áp dụng Circuit Breaker
-//     await breaker.fire()
-//       .then(response => console.log(response))
-//       .catch(error => console.log('Circuit Breaker failed:', error));
-
-//   } catch (error) {
-//     console.error('Error during service request:', error);
-//   }
-// }
-
-// module.exports = { handleServiceRequest };
+exports.fetchOrdersWithTimeout = fetchOrdersWithTimeout;
+exports.timeoutPromise = timeoutPromise;

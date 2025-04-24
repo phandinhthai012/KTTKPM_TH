@@ -1,6 +1,8 @@
 const Customer = require('../model/customerModel')
 const { breaker } = require('../config/circuitBreaker');
 const { sendToQueue } = require('../config/rabbitmq');
+const { fetchOrdersWithRetry } = require('../config/retry');
+const { fetchOrdersWithTimeout } = require('../config/timeout');
 const createCustomer = async (req, res) => {
     try {
         const { name, email, phone, address } = req.body;
@@ -79,12 +81,36 @@ const getOderByCustomerId = async (req, res) => {
     }
 }
 
+const getCustomerOrdersRetry = async (req, res) => {
+    const customerId = req.params.id;
+  
+    try {
+      const orders = await fetchOrdersWithRetry(customerId);
+      res.status(200).json({ customerId, orders });
+    } catch (err) {
+      res.status(500).json({ message: 'Failed to fetch orders with retry.', error: err.message });
+    }
+  };
+  
+const getCustomerOrdersTimeLimiter = async (req, res) => {
+    const customerId = req.params.id;
+  
+    try {
+      const orders = await fetchOrdersWithTimeout(customerId, 3000); // 3 giây timeout
+      res.status(200).json({ customerId, orders });
+    } catch (err) {
+      res.status(500).json({ message: 'Failed to fetch orders with timeout.', error: err.message });
+    }
+  }
+
 const customerController = {
     createCustomer,
     getAllCustomers,
     getCustomerById,
     updateCustomer,
     deleteCustomer,
-    getOderByCustomerId
+    getOderByCustomerId,
+    getCustomerOrdersRetry,
+    getCustomerOrdersTimeLimiter
 }
 module.exports = customerController;

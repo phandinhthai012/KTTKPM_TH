@@ -32,13 +32,13 @@ connectDB()
     });
 
     // Kết nối RabbitMQ sau khi MongoDB đã sẵn sàng
-    connectRabbitMQ()
-      .then(() => {
-        console.log('Connected to RabbitMQ successfully!');
-      })
-      .catch((error) => {
-        console.error('Error connecting to RabbitMQ:', error);
-      });
+    // connectRabbitMQ()
+    //   .then(() => {
+    //     console.log('Connected to RabbitMQ successfully!');
+    //   })
+    //   .catch((error) => {
+    //     console.error('Error connecting to RabbitMQ:', error);
+    //   });
 
   })
   .catch((error) => {
